@@ -3,7 +3,7 @@
     "name": "Punie/elm-parser-extras",
     "summary": "Convenience functions for building parser with elm/parser",
     "license": "BSD-3-Clause",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "exposed-modules": [
         "Parser.Extras",
         "Parser.Expression"

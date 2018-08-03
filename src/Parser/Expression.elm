@@ -4,19 +4,27 @@ module Parser.Expression
         , Operator(..)
         , OperatorTable
         , buildExpressionParser
+        , infixOperator
+        , postfixOperator
+        , prefixOperator
         )
 
 {-| Tools for building parsers for prefix, postfix or infix operator expressions.
 
 
-# Builder
-
-@docs buildExpressionParser
-
-
 # Types
 
 @docs Operator, OperatorTable, Assoc
+
+
+# Operators
+
+@docs prefixOperator, infixOperator, postfixOperator
+
+
+# Builder
+
+@docs buildExpressionParser
 
 -}
 
@@ -24,7 +32,7 @@ import Parser exposing (..)
 import Tuple
 
 
-{-| Data Type representing an operator.
+{-| The representation for an operator parser.
 An operator can either be binary infix and require an associativity,
 or it can be unary prefix or postfix.
 -}
@@ -42,7 +50,7 @@ type alias OperatorTable a =
     List (List (Operator a))
 
 
-{-| Data type representing the associativity of an operator.
+{-| The associativity of an operator.
 -}
 type Assoc
     = AssocNone
@@ -50,29 +58,41 @@ type Assoc
     | AssocRight
 
 
+{-| Create a prefix operator parser from a unary function
+and a parser for the operator symbol.
+-}
+prefixOperator : (a -> a) -> Parser () -> Operator a
+prefixOperator fn opParser =
+    Prefix (unaryOp fn opParser)
+
+
+{-| Create an infix operator parser from a binary function,
+a parser for the operator symbol and an associativity.
+-}
+infixOperator : (a -> a -> a) -> Parser () -> Assoc -> Operator a
+infixOperator fn opParser assoc =
+    Infix (binaryOp fn opParser) assoc
+
+
+{-| Create a postfix operator parser from a unary function
+and a parser for the operator symbol.
+-}
+postfixOperator : (a -> a) -> Parser () -> Operator a
+postfixOperator fn opParser =
+    Postfix (unaryOp fn opParser)
+
+
 {-| Build an expression parser for terms from a table of operators,
 taking into account precedence and associativity.
 
 The following would define a simple arithmetic parser.
 
-    unaryOp : (a -> a) -> Parser () -> Parser (a -> a)
-    unaryOp f p =
-        succeed f
-            |. p
-            |. spaces
-
-    binaryOp : (a -> a -> a) -> Parser () -> Parser (a -> a -> a)
-    binaryOp f p =
-        succeed f
-            |. p
-            |. spaces
-
     operators : OperatorTable number
     operators =
-        [ [ Prefix (unaryOp negate (symbol "-")), Prefix (unaryOp identity (symbol "+")) ]
-        , [ Postfix (unaryOp (\x -> x + 1) (symbol "++")) ]
-        , [ Infix (binaryOp (*) (symbol "*")) AssocLeft ]
-        , [ Infix (binaryOp (+) (symbol "+")) AssocLeft, Infix (binaryOp (-) (symbol "-")) AssocLeft ]
+        [ [ prefixOperator negate (symbol "-"), prefixOperator identity (symbol "+") ]
+        , [ postfixOperator (\x -> x + 1) (symbol "++") ]
+        , [ infixOperator (*) (symbol "*") AssocLeft ]
+        , [ infixOperator (+) (symbol "+") AssocLeft, infixOperator (-) (symbol "-") AssocLeft ]
         ]
 
     term : Parser Int
@@ -241,3 +261,17 @@ splitOp operator ({ rassoc, lassoc, nassoc, prefix, postfix } as ops) =
 
         Postfix op ->
             { ops | postfix = op :: ops.postfix }
+
+
+unaryOp : (a -> a) -> Parser () -> Parser (a -> a)
+unaryOp fn opParser =
+    succeed fn
+        |. opParser
+        |. spaces
+
+
+binaryOp : (a -> a -> a) -> Parser () -> Parser (a -> a -> a)
+binaryOp fn opParser =
+    succeed fn
+        |. opParser
+        |. spaces
