@@ -78,13 +78,14 @@ The following would define a simple arithmetic parser.
     term : Parser Int
     term =
         oneOf
-            [ parens <| lazy (_ -> expr)
-            , int |. spaces
+            [ parens <| lazy (\_ -> expr)
+            , int
+                |. spaces
             ]
 
     expr : Parser Int
     expr =
-        buildExpressionParser operators (lazy <| _ -> term)
+        buildExpressionParser operators (lazy <| \_ -> term)
 
 -}
 buildExpressionParser : OperatorTable a -> Parser a -> Parser a
