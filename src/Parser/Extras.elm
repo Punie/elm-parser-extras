@@ -63,7 +63,7 @@ parens =
 
 {-| Parse an expression between curly braces.
 
-    braces p == between (symbol "[") (symbol "]") p
+    braces p == between (symbol "{") (symbol "}") p
 
 -}
 braces : Parser a -> Parser a
