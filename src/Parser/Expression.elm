@@ -245,16 +245,14 @@ initOps =
 splitOp : Operator a -> Ops a -> Ops a
 splitOp operator ({ rassoc, lassoc, nassoc, prefix, postfix } as ops) =
     case operator of
-        Infix op assoc ->
-            case assoc of
-                AssocNone ->
-                    { ops | nassoc = op :: ops.nassoc }
+        Infix op AssocNone ->
+            { ops | nassoc = op :: ops.nassoc }
 
-                AssocLeft ->
-                    { ops | lassoc = op :: ops.lassoc }
+        Infix op AssocLeft ->
+            { ops | lassoc = op :: ops.lassoc }
 
-                AssocRight ->
-                    { ops | rassoc = op :: ops.rassoc }
+        Infix op AssocRight ->
+            { ops | rassoc = op :: ops.rassoc }
 
         Prefix op ->
             { ops | prefix = op :: ops.prefix }
