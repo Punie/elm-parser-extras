@@ -100,7 +100,6 @@ The following would define a simple arithmetic parser.
         oneOf
             [ parens <| lazy (\_ -> expr)
             , int
-                |. spaces
             ]
 
     expr : Parser Int
@@ -225,8 +224,8 @@ makeParser ops term =
                 |= termP
                 |> andThen (\( f, y ) -> oneOf [ ambiguousRight, ambiguousLeft, ambiguousNon, succeed (f x y) ])
     in
-        termP
-            |> andThen (\x -> oneOf [ rassocP x, lassocP x, nassocP x, succeed x ])
+    termP
+        |> andThen (\x -> oneOf [ rassocP x, lassocP x, nassocP x, succeed x ])
 
 
 type alias Ops a =
@@ -265,11 +264,9 @@ unaryOp : (a -> a) -> Parser () -> Parser (a -> a)
 unaryOp fn opParser =
     succeed fn
         |. opParser
-        |. spaces
 
 
 binaryOp : (a -> a -> a) -> Parser () -> Parser (a -> a -> a)
 binaryOp fn opParser =
     succeed fn
         |. opParser
-        |. spaces
