@@ -11,7 +11,6 @@ env:
 
 cache:
   directories:
-    - elm-stuff
     - sysconfcpus
     - $HOME/.npm # https://stackoverflow.com/a/42523517/1148249
 
