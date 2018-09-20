@@ -1,13 +1,8 @@
-module Parser.Expression
-    exposing
-        ( Assoc(..)
-        , Operator(..)
-        , OperatorTable
-        , buildExpressionParser
-        , infixOperator
-        , postfixOperator
-        , prefixOperator
-        )
+module Parser.Expression exposing
+    ( Operator(..), OperatorTable, Assoc(..)
+    , prefixOperator, infixOperator, postfixOperator
+    , buildExpressionParser
+    )
 
 {-| Tools for building parsers for prefix, postfix or infix operator expressions.
 
@@ -225,8 +220,8 @@ makeParser ops term =
                 |= termP
                 |> andThen (\( f, y ) -> oneOf [ ambiguousRight, ambiguousLeft, ambiguousNon, succeed (f x y) ])
     in
-        termP
-            |> andThen (\x -> oneOf [ rassocP x, lassocP x, nassocP x, succeed x ])
+    termP
+        |> andThen (\x -> oneOf [ rassocP x, lassocP x, nassocP x, succeed x ])
 
 
 type alias Ops a =
