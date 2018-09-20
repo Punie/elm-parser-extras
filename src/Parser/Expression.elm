@@ -93,7 +93,8 @@ The following would define a simple arithmetic parser.
     term : Parser Int
     term =
         oneOf
-            [ parens <| lazy (\_ -> expr)
+            [ parens (lazy (\_ -> expr))
+                |. spaces
             , int
                 |. spaces
             ]
