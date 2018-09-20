@@ -50,11 +50,11 @@ many =
             \_ ->
                 Parser.run (Parser.Extras.many complexTerm) ""
                     |> Expect.equal (Ok [])
-        , test "return an the list of results (simpleTerm)" <|
+        , test "return the list of results (simpleTerm)" <|
             \_ ->
                 Parser.run (Parser.Extras.many simpleTerm) "42 1337"
                     |> Expect.equal (Ok [ 42, 1337 ])
-        , test "return an the list of results (complexTerm)" <|
+        , test "return the list of results (complexTerm)" <|
             \_ ->
                 Parser.run (Parser.Extras.many complexTerm) "(42, 1337) (5, 25)"
                     |> Expect.equal (Ok [ Point 42 1337, Point 5 25 ])
@@ -80,11 +80,11 @@ some =
             \_ ->
                 Parser.run (Parser.Extras.some complexTerm) "(42, 1337)"
                     |> Expect.equal (Ok ( Point 42 1337, [] ))
-        , test "returns a single element when given more than one (simpleTerm)" <|
+        , test "returns the expected elements when given more than one (simpleTerm)" <|
             \_ ->
                 Parser.run (Parser.Extras.some simpleTerm) "42 1337"
                     |> Expect.equal (Ok ( 42, [ 1337 ] ))
-        , test "returns a single element when given more than one (complexTerm)" <|
+        , test "returns the expected elements when given more than one (complexTerm)" <|
             \_ ->
                 Parser.run (Parser.Extras.some complexTerm) "(42, 1337) (5, 25)"
                     |> Expect.equal (Ok ( Point 42 1337, [ Point 5 25 ] ))
