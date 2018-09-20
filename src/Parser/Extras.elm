@@ -1,12 +1,4 @@
-module Parser.Extras
-    exposing
-        ( many
-        , some
-        , between
-        , parens
-        , braces
-        , brackets
-        )
+module Parser.Extras exposing (many, some, between, parens, braces, brackets)
 
 {-| Some convenience parser combinators.
 
