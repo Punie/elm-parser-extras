@@ -1,51 +1,90 @@
-module Parser.Extras exposing (many, some, between, parens, braces, brackets)
+module Parser.Extras
+    exposing
+        ( between
+        , braces
+        , brackets
+        , by
+        , many
+        , parens
+        , some
+        , spacy
+        )
 
 {-| Some convenience parser combinators.
 
 
 # Combinators
 
-@docs many, some, between, parens, braces, brackets
+@docs many, some, by, spacy, between, parens, braces, brackets
 
 -}
 
 import Parser exposing (..)
-import Tuple
+
+
+{-| Apply a parser one or more times and return a list of the results.
+-}
+some : Parser a -> Parser ( a, List a )
+some item =
+    succeed Tuple.pair
+        |= item
+        |= many item
 
 
 {-| Apply a parser zero or more times and return a list of the results.
 -}
 many : Parser a -> Parser (List a)
-many p =
-    loop [] (manyHelp p)
+many item =
+    let
+        helper vs =
+            oneOf
+                [ succeed (\v -> Loop (v :: vs))
+                    |= item
+                , succeed ()
+                    |> map (\() -> Done (List.reverse vs))
+                ]
+    in
+    loop [] helper
 
 
-{-| Apply a parser one or more times and return a tuple of the first result parsed
-and the list of the remaining results.
+{-| Parse an item one or more times separated by a separator.
 -}
-some : Parser a -> Parser ( a, List a )
-some p =
-    succeed Tuple.pair
-        |= p
+by : Parser () -> Parser a -> Parser (List a)
+by sep item =
+    let
+        more =
+            succeed identity
+                |. backtrackable sep
+                |= item
+    in
+    succeed (::)
+        |= item
+        |= many more
+
+
+{-| Parse an item with spaces before and after.
+-}
+spacy : Parser a -> Parser a
+spacy item =
+    succeed identity
         |. spaces
-        |= many p
+        |= item
+        |. spaces
 
 
-{-| Parse an expression between two other parsers
+{-| Parse an item between two other parsers.
 -}
 between : Parser opening -> Parser closing -> Parser a -> Parser a
-between opening closing p =
+between opening closing item =
     succeed identity
         |. opening
-        |. spaces
-        |= p
-        |. spaces
+        |= item
         |. closing
 
 
 {-| Parse an expression between parenthesis.
 
-    parens p == between (symbol "(") (symbol ")") p
+    parens item == between (symbol "(") (symbol ")") item
 
 -}
 parens : Parser a -> Parser a
@@ -55,7 +94,7 @@ parens =
 
 {-| Parse an expression between curly braces.
 
-    braces p == between (symbol "{") (symbol "}") p
+    braces item == between (symbol "{") (symbol "}") item
 
 -}
 braces : Parser a -> Parser a
@@ -65,24 +104,9 @@ braces =
 
 {-| Parse an expression between square brackets.
 
-    brackets p == between (symbol "[") (symbol "]") p
+    brackets item == between (symbol "[") (symbol "]") item
 
 -}
 brackets : Parser a -> Parser a
 brackets =
     between (symbol "[") (symbol "]")
-
-
-
--- HELPERS
-
-
-manyHelp : Parser a -> List a -> Parser (Step (List a) (List a))
-manyHelp p vs =
-    oneOf
-        [ succeed (\v -> Loop (v :: vs))
-            |= p
-            |. spaces
-        , succeed ()
-            |> map (\_ -> Done (List.reverse vs))
-        ]

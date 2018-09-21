@@ -96,7 +96,6 @@ The following would define a simple arithmetic parser.
             [ parens (lazy (\_ -> expr))
                 |. spaces
             , int
-                |. spaces
             ]
 
     expr : Parser Int
@@ -261,11 +260,9 @@ unaryOp : (a -> a) -> Parser () -> Parser (a -> a)
 unaryOp fn opParser =
     succeed fn
         |. opParser
-        |. spaces
 
 
 binaryOp : (a -> a -> a) -> Parser () -> Parser (a -> a -> a)
 binaryOp fn opParser =
     succeed fn
         |. opParser
-        |. spaces
