@@ -64,7 +64,7 @@ by sep item =
 
 {-| Parse an item with spaces before and after.
 -}
-spacy : Parser () -> Parser ()
+spacy : Parser a -> Parser a
 spacy item =
     succeed identity
         |. spaces
