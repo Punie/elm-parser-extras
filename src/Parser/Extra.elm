@@ -19,14 +19,15 @@ module Parser.Extra
 
 -}
 
+import List.Nonempty as Nonempty exposing (Nonempty(..))
 import Parser exposing (..)
 
 
 {-| Apply a parser one or more times and return a list of the results.
 -}
-some : Parser a -> Parser (List a)
+some : Parser a -> Parser (Nonempty a)
 some item =
-    succeed (::)
+    succeed Nonempty
         |= item
         |= many item
 
