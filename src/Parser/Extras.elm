@@ -1,4 +1,4 @@
-module Parser.Extra
+module Parser.Extras
     exposing
         ( between
         , braces
