@@ -1,13 +1,8 @@
-module Parser.Expression
-    exposing
-        ( Assoc(..)
-        , Operator(..)
-        , OperatorTable
-        , buildExpressionParser
-        , infixOperator
-        , postfixOperator
-        , prefixOperator
-        )
+module Parser.Expression exposing
+    ( Operator(..), OperatorTable, Assoc(..)
+    , prefixOperator, infixOperator, postfixOperator
+    , buildExpressionParser
+    )
 
 {-| Tools for building parsers for prefix, postfix or infix operator expressions.
 
@@ -98,7 +93,8 @@ The following would define a simple arithmetic parser.
     term : Parser Int
     term =
         oneOf
-            [ parens <| lazy (\_ -> expr)
+            [ parens (lazy (\_ -> expr))
+                |. spaces
             , int
             ]
 
