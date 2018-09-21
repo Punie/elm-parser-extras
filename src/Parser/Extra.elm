@@ -24,9 +24,9 @@ import Parser exposing (..)
 
 {-| Apply a parser one or more times and return a list of the results.
 -}
-some : Parser a -> Parser (List a)
+some : Parser a -> Parser ( a, List a )
 some item =
-    succeed (::)
+    succeed Tuple.pair
         |= item
         |= many item
 
